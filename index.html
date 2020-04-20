@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="master.css">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <title>Feedback Interface</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col">
+        <div class="container" id="code">
+          <div><code class="comments"># Python program to find the SHA-1 message digest of a file&nbsp; </code></div>
+          <div><code class="comments"># importing the hashlib module </code></div>
+          <div><code class="comments"></code></div>
+          <div><code class="comments">&nbsp;for i in range(0, 10): </code></div>
+          <div><code class="comments">&nbsp;&nbsp;&nbsp;&nbsp;print("Hello World") </code></div>
+          <div><code class="comments"></code></div>
+          <div><code class="comments">&nbsp;print("Goodbye World") </code></div>
+          <div><code class="comments"></code></div>
+          <div><code class="comments">def hash_file(filename):</code></div>
+          <div><code class="comments">&nbsp; """"This function returns the SHA-1 hash</code></div>
+          <div><code class="comments">&nbsp;of the file passed into it"""</code></div>
+          <div><code class="comments">&nbsp;h = hashlib.sha1()</code></div>
+          <div><code class="comments">&nbsp;with open(filename,'rb') as file:</code></div>
+          <div><code class="comments">&nbsp;&nbsp;chunk = 0</code></div>
+          <div><code class="comments"></code></div>
+          <div><code class="comments">&nbsp;&nbsp;while chunk != b'':</code></div>
+          <div><code class="comments">&nbsp;&nbsp;&nbsp;# read only 1024 bytes at a time</code></div>
+          <div><code class="comments">&nbsp;&nbsp;&nbsp;chunk = file.read(1024)</code></div>
+            <div><code class="comments">&nbsp;&nbsp;&nbsp;h.update(chunk)</code></div>
+        </div>
+
+      </div>
+
+      <div class="col">
+        <div class="feedback">
+          <input type="text" name="" value="" id="feedbackinput" placeholder="Feedback...">
+          <button type="submit" name="button" onclick="saveFeedback()">Submit</button>
+          <br>
+          <h5>Near the word:</h5>
+          <h6 id="feedbackbox"></h6>
+          <h5>After how many characters</h5>
+          <h6 id="characters"></h6>
+          <h5>At line:</h5>
+          <h6 id="feedbackline"></h6>
+        </div>
+      </div>
+        <div class="col">
+          <div class="savedfeedback">
+          </div>
+        </div>
+      </div>
+  <script type="text/javascript" src="selector.js"></script>
+  </body>
+</html>
