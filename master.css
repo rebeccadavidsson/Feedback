@@ -4,7 +4,6 @@ body {
 
 #code {
   margin: 40px;
-  padding-top: 30px;
   -webkit-font-smoothing: antialiased;
   color: #25265e;
   text-rendering: optimizeLegibility;
@@ -45,7 +44,7 @@ button {
 
 .feedback {
   background-color: #eaeaea;
-  padding: 20px;
+  padding: 30px;
   display: none;
 }
 
@@ -84,22 +83,28 @@ button {
 }
 
 
-/* .feedback-input:after
-{
-  content: "";
-  position: absolute;
-  top: 42px;
-  border-top: 8px solid transparent;
-  border-left: 8px solid #80a7ba;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-} */
-
-
 .circle-wrapper {
   position: absolute;
   transform: translate(-50%, -50%);
   opacity: 1;
+}
+
+.savedfeedback {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+}
+
+.finalfeedback {
+  position: absolute;
+  transform: translate(0, -50%);
+  opacity: 1;
+  left: 40%;
+  background-color: #8585b1;
+  color: white;
+  z-index: 100;
+  padding: 10px;
+
 }
 
 .circle {

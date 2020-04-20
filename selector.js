@@ -1,3 +1,8 @@
+// global variable to save selections
+// TODO: store in database
+savedselections = [];
+id = 0;
+
 // Add line numbers
 var code = document.querySelectorAll(".comments");
 code.forEach((item, i) => {
@@ -17,6 +22,9 @@ $('#code').click(function(e) {
   var range = selection.getRangeAt(0);
   var node = selection.anchorNode;
   var word_regexp = /^\w*$/;
+  var saveNode = range.startContainer;
+
+  console.log(range, "firstrange");
 
   // Extend the range backward until it matches word beginning
   while ((range.startOffset > 0) && range.toString().match(word_regexp)) {
@@ -49,35 +57,72 @@ $('#code').click(function(e) {
 
   // Store information temporally
   dict = {
+    "id" : id,
     "word": word,
-    "parentnode": parentnode,
-    "anchorOffset": anchorOffset,
-    "line": line
+    "selection": selection,
+    "savenode": range.startContainer,
+    "startOffset": range.startOffset,  // where the range starts
+    "endOffset": range.endOffset,      // where the range ends
+    "nodeData": saveNode.data,         // the actual selected text
+    "nodeHTML": saveNode.parentElement.innerHTML,
+    "nodeTagName": saveNode.parentElement.tagName,
   };
-
+;
+  // TODO: store in database
   popUpFeedback(e)
 
 });
 
 
-function saveFeedback(input) {
+function saveFeedback() {
 
   // Get feedback text
   var input = document.querySelector("#feedbackinput").value;
   dict["feedback"] = input;
 
-  // Add saved info
-  var paragraph = "<p>" + JSON.stringify(dict) + "</p>";
-  document.querySelector('.savedfeedback').innerHTML += paragraph;
+  // Store selection
+  savedselections.push({
+    "id":   dict["id"],
+    "total": dict
+  });
+
+  // Store location of this feedback
+  var feedbackcircle = $('.circle-wrapper');
+  feedbackcircle.removeClass("circle-wrapper");
+  feedbackcircle.addClass("savedfeedback");
+  feedbackcircle.attr('id', "savedfeedback" + dict["id"])
 
   // TODO: Store data in database
+  id += 1
+
+  // Build new range
+  var range = buildRange(dict["startOffset"],
+                    dict["endOffset"],
+                    dict["nodeData"],
+                    dict["nodeHTML"],
+                    dict["nodeTagName"])
+
+  var range = range.getBoundingClientRect()
+  // TODO get middle in stead of left boundary
+  var xPage = range.x + 20;
+  var yPage = range.y + 5;
+
+  // Make new element with saved feedback
+  $('<div class="finalfeedback">')
+            .css({
+                // "left": xPage + 'px',
+                "top": yPage + 'px'
+            })
+            .append(input)
+            .appendTo(document.body);
+
 }
 
 
 function popUpFeedback(e) {
 
   var feedbacktotal = document.querySelector('.feedback');
-  feedbacktotal.style.display = 'block';
+  feedbacktotal.style.display = 'grid';
 
   // Remove old feedback
   var oldfeedbackcircle = document.querySelector('.circle-wrapper');
@@ -100,7 +145,6 @@ function popUpFeedback(e) {
 
   // Input pop up
   $('<div class="feedback-input">').css({
-            // "left": e.pageX + 'px',
             "top": e.pageY + 'px'
         })
         .append($('.feedback'))
@@ -108,10 +152,59 @@ function popUpFeedback(e) {
 
 }
 
+function buildRange(startOffset, endOffset, nodeData, nodeHTML, nodeTagName){
+
+    var cDoc = document.getElementById("code");
+    var tagList = cDoc.getElementsByTagName(nodeTagName);
+
+    // find the parent element with the same innerHTML
+    for (var i = 0; i < tagList.length; i++) {
+        if (tagList[i].innerHTML == nodeHTML) {
+            var foundEle = tagList[i];
+        }
+    }
+
+    // find the node within the element by comparing node data
+    var nodeList = foundEle.childNodes;
+    for (var i = 0; i < nodeList.length; i++) {
+        if (nodeList[i].data == nodeData) {
+            var foundNode = nodeList[i];
+        }
+    }
+
+    // create the range
+    var range = document.createRange();
+    range.setStart(foundNode, startOffset);
+    range.setEnd(foundNode, endOffset);
+    return range;
+}
+
 
 // Attatch circle to closest word on resize
 $(window).resize(function() {
 
+  savedselections.forEach((item, i) => {
+
+    // Build new range
+    var range = buildRange(item["total"]["startOffset"],
+                      item["total"]["endOffset"],
+                      item["total"]["nodeData"],
+                      item["total"]["nodeHTML"],
+                      item["total"]["nodeTagName"])
+
+    var range = range.getBoundingClientRect()
+    // TODO get middle in stead of left boundary
+    var xPage = range.x + 20;
+    var yPage = range.y + 5;
+
+    // Let circle to be attachted to closest word
+    $('#savedfeedback' + i).css({
+      "left": xPage + 'px',
+      "top": yPage + 'px'
+    })
+  });
+
+  // Do the same for the current selection
   var selection = window.getSelection();
 
   // Check if there was a selection made
@@ -119,18 +212,16 @@ $(window).resize(function() {
     return true
   };
 
-  // Get location of selected element
   var range = selection.getRangeAt(0).getBoundingClientRect();
 
   // TODO get middle in stead of left boundary
-  xPage = range.x + 20;
-  yPage = range.y + 5;
+  var xPage = range.x + 20;
+  var yPage = range.y + 5;
 
   // Let circle to be attachted to closest word
   $('.circle-wrapper').css({
     "left": xPage + 'px',
     "top": yPage + 'px'
   })
-
 
 });
