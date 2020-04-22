@@ -115,3 +115,16 @@ button {
   opacity: 0.5;
   display: inline-block;
 }
+
+.highlight {
+  background: #3f51b5d6;
+ position: absolute;
+ opacity: 0.5;
+}
+
+.savedhighlight, .highlight {
+  background: #3f51b5d6;
+  position: absolute;
+  opacity: 0.5;
+  cursor: pointer;
+}

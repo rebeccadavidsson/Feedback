@@ -24,8 +24,6 @@ $('#code').click(function(e) {
   var word_regexp = /^\w*$/;
   var saveNode = range.startContainer;
 
-  console.log(range, "firstrange");
-
   // Extend the range backward until it matches word beginning
   while ((range.startOffset > 0) && range.toString().match(word_regexp)) {
     range.setStart(node, (range.startOffset - 1));
@@ -69,7 +67,7 @@ $('#code').click(function(e) {
   };
 ;
   // TODO: store in database
-  popUpFeedback(e)
+  popUpFeedback(e, range)
 
 });
 
@@ -88,9 +86,15 @@ function saveFeedback() {
 
   // Store location of this feedback
   var feedbackcircle = $('.circle-wrapper');
+  var highlights = $('.highlight');
+
+  // Change class + store ids
   feedbackcircle.removeClass("circle-wrapper");
   feedbackcircle.addClass("savedfeedback");
   feedbackcircle.attr('id', "savedfeedback" + dict["id"])
+  highlights.removeClass("highlight");
+  highlights.addClass("savedhighlight");
+  highlights.attr('id', "savedhighlight" + dict["id"])
 
   // TODO: Store data in database
   id += 1
@@ -103,6 +107,7 @@ function saveFeedback() {
                     dict["nodeTagName"])
 
   var range = range.getBoundingClientRect()
+
   // TODO get middle in stead of left boundary
   var xPage = range.x + 20;
   var yPage = range.y + 5;
@@ -116,22 +121,32 @@ function saveFeedback() {
             .append(input)
             .appendTo(document.body);
 
+    // Add highlighted div
+    $('<div class="highlight"></div>').css({
+          "x": xPage + 'px',
+          "y": yPage + 'px',
+          'width': range.width + 'px',
+          'height': range.height + 'px',
+          'top': range.top + 'px',
+          'right': range.right + 'px',
+          'bottom': range.bottom + 'px',
+          'left': range.left + 'px'
+        })
+        .appendTo(document.body);
+
 }
 
 
-function popUpFeedback(e) {
+function popUpFeedback(e, range) {
 
   var feedbacktotal = document.querySelector('.feedback');
   feedbacktotal.style.display = 'grid';
 
   // Remove old feedback
   var oldfeedbackcircle = document.querySelector('.circle-wrapper');
-  var oldfeedback = document.querySelector('.feedback-input');
+
   if (oldfeedbackcircle)  {
     oldfeedbackcircle.remove();
-
-    // TODO
-    // oldfeedback.remove();
   }
 
   // Add circle to clicked location
@@ -149,6 +164,20 @@ function popUpFeedback(e) {
         })
         .append($('.feedback'))
         .appendTo(document.body)
+
+  // Add highlighted div
+  $('<div class="highlight"></div>').css({
+        "x": range.x + 'px',
+        "y": range.y + 'px',
+        'width': range.width + 'px',
+        'height': range.height + 'px',
+        'top': range.top + 'px',
+        'right': range.right + 'px',
+        'bottom': range.bottom + 'px',
+        'left': range.left + 'px'
+      })
+      .appendTo(document.body);
+
 
 }
 
@@ -192,16 +221,30 @@ $(window).resize(function() {
                       item["total"]["nodeHTML"],
                       item["total"]["nodeTagName"])
 
-    var range = range.getBoundingClientRect()
+    var rangeBounded = range.getBoundingClientRect()
+
     // TODO get middle in stead of left boundary
-    var xPage = range.x + 20;
-    var yPage = range.y + 5;
+    var xPage = rangeBounded.x + 20;
+    var yPage = rangeBounded.y + 5;
 
     // Let circle to be attachted to closest word
-    $('#savedfeedback' + i).css({
+    $('#savedfeedback' + item["id"]).css({
       "left": xPage + 'px',
       "top": yPage + 'px'
-    })
+    });
+
+    // Change position of highlighted div
+    $('#savedhighlight' + item["id"]).css({
+          "x":      rangeBounded.x + 'px',
+          "y":      rangeBounded.y + 'px',
+          'width':  rangeBounded.width + 'px',
+          'height': rangeBounded.height + 'px',
+          'top':    rangeBounded.top + 'px',
+          'right':  rangeBounded.right + 'px',
+          'bottom': rangeBounded.bottom + 'px',
+          'left':   rangeBounded.left + 'px'
+        });
+
   });
 
   // Do the same for the current selection
@@ -224,4 +267,22 @@ $(window).resize(function() {
     "top": yPage + 'px'
   })
 
+  // Add highlighted div
+  $('.highlight').css({
+      "x": range.x + 'px',
+      "y": range.y + 'px',
+      'width': range.width + 'px',
+      'height': range.height + 'px',
+      'top': range.top + 'px',
+      'right': range.right + 'px',
+      'bottom': range.bottom + 'px',
+      'left': range.left + 'px'
+    });
+
 });
+
+
+// TODO: function to remove saved feedback
+$('div.highlight').click(function(e) {
+  e.remove();
+})
